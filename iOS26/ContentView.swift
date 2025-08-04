@@ -18,8 +18,14 @@ struct ContentView: View {
 //                        }
                         
                         Text("Finish")
+                            .onTapGesture {
+                                withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
+                                    progress = 0
+                                }
+                            }
 //                            .containerValue(\.tintColor, .green.opacity(progress))
                             .containerValue(\.contentPadding, -25)
+                        
 
                         Text("0:02")
                             .containerValue(\.contentPadding, -25)
@@ -38,6 +44,11 @@ struct ContentView: View {
 //                            Text("Edit")
 //                            Image(systemName: "ellipsis")
                             Label("Start", systemImage: "play.fill")
+                                .onTapGesture {
+                                    withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
+                                        progress = 1
+                                    }
+                                }
                                 .opacity(1 - progress)
 //                            Text("Done")
 //                            Image(systemName: "xmark")
