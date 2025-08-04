@@ -5,6 +5,7 @@ struct ExpandableHorizontalGlassContainer<Content: View, Label: View>: View, Ani
     var isInteractive = true
     var size: CGSize = .init(width: 55, height: 55)
     var progress: CGFloat
+    var state: WorkoutStage
     var labelProgressPadding: CGFloat = 0 // padding on the label when progress is 1.0
     @ViewBuilder var content: Content
     @ViewBuilder var label: Label
@@ -60,7 +61,7 @@ struct ExpandableHorizontalGlassContainer<Content: View, Label: View>: View, Ani
         label
             .compositingGroup()
             .blur(radius: 15 * scaleProgress)
-            .frame(width: size.width + (labelProgressPadding * 2) * progress, height: size.height)
+            .frame(width: labelWidth, height: size.height)
             .glassEffect(.regular.interactive(isInteractive), in: .capsule)
             .onGeometryChange(for: CGRect.self) {
                 $0.frame(in: .named("container"))
@@ -69,6 +70,15 @@ struct ExpandableHorizontalGlassContainer<Content: View, Label: View>: View, Ani
             }
     }
     
+    var labelWidth: CGFloat {
+        size.width + (labelProgressPadding * 2) * labelProgressPaddingFactor
+    }
+    var labelProgressPaddingFactor: CGFloat {
+        switch state {
+        case .initial, .started, .picker: return progress
+        default : return 0
+        }
+    }
     var scaleProgress: CGFloat { progress > 0.5 ? (1 - progress) / 0.5 : (progress / 0.5) }
     var spacing: CGFloat { 10.0 * progress }
 }
