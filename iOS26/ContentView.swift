@@ -27,8 +27,19 @@ struct ContentView: View {
                         } else if viewModel.state == .picker {
                             ForEach(RestTimeSeconds.allCases, id: \.self) { value in
                                 Text(value.description)
+                                    .onTapGesture {
+                                        withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
+                                            viewModel.progress = 0
+                                            viewModel.startTimer(for: value)
+                                        }
+                                    }
                                     .containerValue(\.contentPadding, -20)
                             }
+                        } else if viewModel.state == .resting {
+                            Text("1:43")
+                                .containerValue(\.contentPadding, -20)
+                            
+                            Slider (value: $viewModel.timeInterval, in: 0...60)
                         }
                     } label: {
                         ZStack {
@@ -45,8 +56,6 @@ struct ContentView: View {
                                     .onTapGesture {
                                         withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
                                             viewModel.progress = 0
-                                        }
-                                        withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
                                             viewModel.startWorkout()
                                         }
                                     }
@@ -56,9 +65,16 @@ struct ContentView: View {
                                     .onTapGesture {
                                         withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
                                             viewModel.progress = 0
-                                        }
-                                        withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
                                             viewModel.pickRestTime()
+                                        }
+                                    }
+                                    .opacity(viewModel.progress)
+                            } else if viewModel.state == .resting {
+                                Text("Skip")
+                                    .onTapGesture {
+                                        withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
+                                            viewModel.progress = 0
+                                            viewModel.startWorkout()
                                         }
                                     }
                                     .opacity(viewModel.progress)

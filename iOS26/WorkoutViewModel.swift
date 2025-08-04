@@ -4,6 +4,7 @@ import Foundation
 class WorkoutViewModel: ObservableObject {
     @Published var progress: CGFloat = 0
     @Published var state: WorkoutStage = .initial
+    @Published var timeInterval: TimeInterval = 45
         
     func startWorkout() {
         state = .started
@@ -20,6 +21,11 @@ class WorkoutViewModel: ObservableObject {
         state = .picker
         progress = 1
     }
+    
+    func startTimer(for restTime: RestTimeSeconds) {
+        state = .resting
+        progress = 1
+    }
 }
 
 
@@ -27,7 +33,6 @@ enum RestTimeSeconds: Int, CaseIterable, CustomStringConvertible {
     case short = 30
     case medium = 60
     case long = 120
-    case veryLong = 180
     
     var description: String {
         switch self {
@@ -37,8 +42,6 @@ enum RestTimeSeconds: Int, CaseIterable, CustomStringConvertible {
             return "1 min"
         case .long:
             return "2 min"
-        case .veryLong:
-            return "3 min"
         }
     }
 }
