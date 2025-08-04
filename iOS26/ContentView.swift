@@ -20,7 +20,7 @@ struct ContentView: View {
                                         viewModel.finishWorkout()
                                     }
                                 }
-//                                .containerValue(\.tintColor, .green)
+                                .containerValue(\.tintColor, .green)
                                 .containerValue(\.contentPadding, -20)
                             Text("0:02")
                                 .containerValue(\.contentPadding, -20)
