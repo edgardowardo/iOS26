@@ -18,6 +18,7 @@ class WorkoutViewModel: ObservableObject {
     
     func pickRestTime() {
         state = .picker
+        progress = 1
     }
 }
 
