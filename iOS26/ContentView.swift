@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var progress: CGFloat = 0
+    @ObservedObject private var viewModel: WorkoutViewModel = .init()
     var body: some View {
         List {
             Section("Preview") {
@@ -9,7 +9,7 @@ struct ContentView: View {
                     ExpandableHorizontalGlassContainer(
                         placeAtLeading: false,
                         size: .init(width: 130, height: 55),
-                        progress: progress,
+                        progress: viewModel.progress,
                         labelProgressPadding: -35.0
                     ) {
 
@@ -20,7 +20,7 @@ struct ContentView: View {
                         Text("Finish")
                             .onTapGesture {
                                 withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
-                                    progress = 0
+                                    viewModel.finishWorkout()
                                 }
                             }
 //                            .containerValue(\.tintColor, .green.opacity(progress))
@@ -41,19 +41,21 @@ struct ContentView: View {
 
                     } label: {
                         ZStack {
-//                            Text("Edit")
-//                            Image(systemName: "ellipsis")
                             Label("Start", systemImage: "play.fill")
                                 .onTapGesture {
                                     withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
-                                        progress = 1
+                                        viewModel.startWorkout()
                                     }
                                 }
-                                .opacity(1 - progress)
-//                            Text("Done")
-//                            Image(systemName: "xmark")
+                                .opacity(1 - viewModel.progress)
+
                             Image(systemName: "timer")
-                                .opacity(progress)
+                                .onTapGesture {
+                                    withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
+                                        viewModel.pickRestTime()
+                                    }
+                                }
+                                .opacity(viewModel.progress)
                         }
                         
                     }
@@ -71,11 +73,11 @@ struct ContentView: View {
             }
             
             Section("Properties") {
-                Slider (value: $progress)
+                Slider (value: $viewModel.progress)
                 
                 Button("Toggle Actions") {
                     withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
-                        progress = progress == 0 ? 1 : 0
+                        viewModel.progress = viewModel.progress == 0 ? 1 : 0
                     }
                 }
                 .buttonStyle(.glassProminent)
