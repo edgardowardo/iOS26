@@ -44,7 +44,10 @@ struct ContentView: View {
                                 Image(systemName: "xmark")
                                     .onTapGesture {
                                         withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
-                                            viewModel.finishWorkout()
+                                            viewModel.progress = 0
+                                        }
+                                        withAnimation(.bouncy(duration: 1, extraBounce: 0.1)) {
+                                            viewModel.startWorkout()
                                         }
                                     }
                                     .opacity(viewModel.progress)
