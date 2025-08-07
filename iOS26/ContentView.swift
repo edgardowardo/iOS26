@@ -19,13 +19,8 @@ struct MenuGlassContentView: View {
                             }
                     }
                     .overlay {
-                        ExpandableGlassMenu(alignment: .bottom, progress: viewModel.progress) {
-                            VStack(alignment: .leading, spacing: 12) {
-                                RowView("paperplane", "Send")
-                                RowView("arrow.trianglehead.2.counterclockwise", "Swap")
-                                RowView("arrow.down", "Receive")
-                            }
-                            .padding(10)
+                        ExpandableGlassMenu(menuAlignment: .bottom, progress: viewModel.progress) {
+                            numericKeyboardView
                         } label: {
                             Image(systemName: "square.and.arrow.up.fill")
                                 .font(.title3)
@@ -63,6 +58,62 @@ struct MenuGlassContentView: View {
         }
     }
     
+    var numericKeyboardView: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                ForEach(["1", "2", "3"], id: \.self) { num in
+                    Button(action: { /* handle number tap */ }) {
+                        Text(num)
+                            .frame(width: 55, height: 55)
+                            .font(.title)
+                            .background(.background, in: .circle)
+                    }
+                }
+            }
+            HStack(spacing: 12) {
+                ForEach(["4", "5", "6"], id: \.self) { num in
+                    Button(action: { /* handle number tap */ }) {
+                        Text(num)
+                            .frame(width: 55, height: 55)
+                            .font(.title)
+                            .background(.background, in: .circle)
+                    }
+                }
+            }
+            HStack(spacing: 12) {
+                ForEach(["7", "8", "9"], id: \.self) { num in
+                    Button(action: { /* handle number tap */ }) {
+                        Text(num)
+                            .frame(width: 55, height: 55)
+                            .font(.title)
+                            .background(.background, in: .circle)
+                    }
+                }
+            }
+            HStack(spacing: 12) {
+                Button(action: { /* handle space tap */ }) {
+                    Text("")
+                        .frame(width: 55, height: 55)
+                        .font(.title3)
+                        .background(.clear, in: .circle)
+                }
+                Button(action: { /* handle zero tap */ }) {
+                    Text("0")
+                        .frame(width: 55, height: 55)
+                        .font(.title)
+                        .background(.background, in: .circle)
+                }
+                Button(action: { /* handle back tap */ }) {
+                    Text("<")
+                        .frame(width: 55, height: 55)
+                        .font(.title)
+                        .background(.background, in: .circle)
+                }
+            }
+        }
+        .foregroundColor(.primary)
+        .padding(20)
+    }
     
     @ViewBuilder
     func RowView(_ image: String, _ title: String) -> some View {
@@ -103,13 +154,13 @@ struct ContentView: View {
 }
 
 struct ExpandableGlassMenu<Content: View, Label: View>: View, Animatable {
-    var alignment: Alignment
+    var menuAlignment: Alignment = .bottom
     var progress: CGFloat
     var labelSize: CGSize = .init(width: 55, height: 55)
     var cornerRadius: CGFloat = 30
-    @ViewBuilder var content: Content
+    @ViewBuilder var menuContent: Content
     @ViewBuilder var label: Label
-    @State private var contentSize: CGSize = .zero
+    @State private var menuContentSize: CGSize = .zero
     var animatableData: CGFloat {
         get { progress }
         set { progress = newValue }
@@ -117,21 +168,21 @@ struct ExpandableGlassMenu<Content: View, Label: View>: View, Animatable {
 
     var body: some View {
         GlassEffectContainer {
-            let widthDiff = contentSize.width - labelSize.width
-            let heightDiff = contentSize.height - labelSize.height
-            let rWidth = widthDiff * contentOpacity
-            let rHeight = heightDiff * contentOpacity
+            let widthDiff = menuContentSize.width - labelSize.width
+            let heightDiff = menuContentSize.height - labelSize.height
+            let rWidth = widthDiff * menuContentOpacity
+            let rHeight = heightDiff * menuContentOpacity
             
-            ZStack(alignment: alignment) {
-                content
+            ZStack(alignment: menuAlignment) {
+                menuContent
                     .compositingGroup()
-                    .scaleEffect(contentScale)
+                    .scaleEffect(menuContentScale)
                     .blur(radius: 14 * blurProgress)
-                    .opacity(contentOpacity)
+                    .opacity(menuContentOpacity)
                     .onGeometryChange(for: CGSize.self) {
                         $0.size
                     } action: { newValue in
-                        contentSize = newValue
+                        menuContentSize = newValue
                     }
                     .fixedSize()
                     .frame(width: labelSize.width + rWidth,
@@ -154,22 +205,23 @@ struct ExpandableGlassMenu<Content: View, Label: View>: View, Animatable {
         .offset(y: offset * blurProgress)
     }
     
+    // menu related properties
     var labelOpacity: CGFloat { min(progress / 0.35, 1) }
-    var contentOpacity: CGFloat { max(progress - 0.35, 0) / 0.65 }
-    var contentScale: CGFloat {
-        let minAspectScale = min(labelSize.width / contentSize.width, labelSize.height / contentSize.height)
+    var menuContentOpacity: CGFloat { max(progress - 0.35, 0) / 0.65 }
+    var menuContentScale: CGFloat {
+        let minAspectScale = min(labelSize.width / menuContentSize.width, labelSize.height / menuContentSize.height)
         return minAspectScale + (1 - minAspectScale) * progress
     }
     var blurProgress: CGFloat { progress > 0.5 ? (1 - progress) / 0.5 : progress / 0.5 }
     var offset: CGFloat {
-        switch alignment {
+        switch menuAlignment {
         case .bottom, .bottomLeading, .bottomTrailing: -75
         case .top, .topLeading, .topTrailing: 75
         default: 0
         }
     }
     var scaleAnchor: UnitPoint {
-        switch alignment {
+        switch menuAlignment {
         case .bottomLeading: .bottomLeading
         case .bottom: .bottom
         case .bottomTrailing: .bottomTrailing
